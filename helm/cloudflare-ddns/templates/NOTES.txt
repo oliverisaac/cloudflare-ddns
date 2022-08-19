@@ -1,0 +1,1 @@
+This deploys a cronjob which runs on cron schedule `{{ .Values.cronSchedule }}` and updates cloudflare dynamic dns
