@@ -6,10 +6,11 @@ image:
   repository: oliverisaac/cloudflare-ddns
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
 
 cronSchedule: "* * * * *" # every minute
 
+restartPolicy: OnFailure
 
 env:
   # (required if --key and --email not provided) - The API Token that has the Zone.DNS permission for the specific zone.

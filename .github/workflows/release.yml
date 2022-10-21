@@ -2,12 +2,12 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
 jobs:
-  release:
-    runs-on: ubuntu-18.04
+  test:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -22,9 +22,38 @@ jobs:
           version: v1.45.2
       - name: Unit testing
         run: go test ./...
-      - uses: goreleaser/goreleaser-action@v2.9.1
-        with:
-          version: latest
-          args: release --rm-dist
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Docker Image Names
+        id: image_names
         env:
-          GITHUB_TOKEN: ${{ secrets.GORELEASER_GITHUB_TOKEN }}
+          TAGS: ${{ github.sha }},latest
+          FULL_REPO_NAME: ${{github.repo}}
+          DOCKERHUB_NAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |-
+          image_name="${DOCKERHUB_NAME}/${FULL_REPO_NAME##*/}"
+          all_tags=()
+          for tag in ${TAGS//,/ }; do
+            all_tags+=( "$image_name:$tag" )
+          done
+          echo ::set-output name=names::$( printf "%s," "${all_tags[@]}" | sed 's/,$//' )
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ steps.image_names.outputs.names }}

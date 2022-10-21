@@ -5,7 +5,11 @@ metadata:
   labels:
     {{- include "cloudflare-ddns.labels" . | nindent 4 }}
 spec:
-  schedule: '* * * * *'
+  schedule: {{ .Values.cronSchedule | quote }}
+  concurrencyPolicy: "Forbid" # stop two jobs from running at the same time
+  failedJobsHistoryLimit: 1 # how many failed jobs to keep so you can look at the logs
+  successfulJobsHistoryLimit: 1 # how many successful jobs to keep so you can look at the logs
+  startingDeadlineSeconds: 60 # 1 min
   jobTemplate:
     metadata:
       name: {{ include "cloudflare-ddns.fullname" . }}
@@ -21,6 +25,7 @@ spec:
           labels:
             {{- include "cloudflare-ddns.selectorLabels" . | nindent 12 }}
         spec:
+          restartPolicy: {{ .Values.restartPolicy }}
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 10 }}
@@ -35,7 +40,7 @@ spec:
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               envFrom:
               - secretRef:
-                  secretName: {{ include "cloudflare-ddns.fullname" . }}-env
+                  name: {{ include "cloudflare-ddns.fullname" . }}-env
               resources:
                 {{- toYaml .Values.resources | nindent 16 }}
           {{- with .Values.nodeSelector }}
