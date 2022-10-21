@@ -27,4 +27,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+    - CreateNamespace=false # Create the namespace and the secret 'env-from-terraform' using terraform
