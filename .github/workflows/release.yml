@@ -6,23 +6,6 @@ on:
       - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          # Note the fetch-depth: 0 option is required for the change log to
-          # work correctly with goreleaser.
-          fetch-depth: 0
-      - uses: actions/setup-go@v3
-        with:
-          go-version: "^1.15.6"
-      - uses: golangci/golangci-lint-action@v3.1.0
-        with:
-          version: v1.45.2
-      - name: Unit testing
-        run: go test ./...
-
   docker:
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +13,7 @@ jobs:
         id: image_names
         env:
           TAGS: ${{ github.sha }},latest
-          FULL_REPO_NAME: ${{github.repo}}
+          FULL_REPO_NAME: ${{ github.repository }}
           DOCKERHUB_NAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |-
           image_name="${DOCKERHUB_NAME}/${FULL_REPO_NAME##*/}"
@@ -38,7 +21,7 @@ jobs:
           for tag in ${TAGS//,/ }; do
             all_tags+=( "$image_name:$tag" )
           done
-          echo ::set-output name=names::$( printf "%s," "${all_tags[@]}" | sed 's/,$//' )
+          echo "names=$( printf "%s," "${all_tags[@]}" | sed 's/,$//' )" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
