@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudflare-ddns
+  namespace: argocd
+spec:
+  destination:
+    namespace: cloudflare-ddns
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    helm:
+      parameters:
+      - name: image.tag
+        value: ${ARGOCD_APP_REVISION}
+    path: deploy/helm/cloudflare-ddns
+    repoURL: https://github.com/oliverisaac/cloudflare-ddns
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
