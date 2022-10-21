@@ -39,3 +39,4 @@ Configuration is specified in the environment or as command line arguments.
 - `--ipendpoint` or `ENV['CF_IP_ENDPOINT']` (optional, default: `https://api.ipify.org`) - Alternative ip address service endpoint.
 
 Note: One of `--key` and `--email` or `--token` must be defined
+
