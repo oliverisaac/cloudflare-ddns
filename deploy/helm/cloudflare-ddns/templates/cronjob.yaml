@@ -41,6 +41,10 @@ spec:
               envFrom:
               - secretRef:
                   name: {{ include "cloudflare-ddns.fullname" . }}-env
+              {{- with .Values.extraEnvFrom }}
+                {{- toYaml . | nindent 14 }}
+              {{- end }}
+
               resources:
                 {{- toYaml .Values.resources | nindent 16 }}
           {{- with .Values.nodeSelector }}
