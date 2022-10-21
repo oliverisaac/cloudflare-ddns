@@ -17,7 +17,7 @@ spec:
         value: cloudflare-ddns
       - name: fullnameOverride
         value: cloudflare-ddns
-      - name: extraEnvFrom[0].secretRef.Name
+      - name: extraEnvFrom[0].secretRef.name
         value: env-from-terraform
     path: deploy/helm/cloudflare-ddns
     repoURL: https://github.com/oliverisaac/cloudflare-ddns

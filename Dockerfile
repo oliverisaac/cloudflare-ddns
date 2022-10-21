@@ -31,7 +31,7 @@ COPY . .
 RUN go mod download
 RUN go mod verify
 # Build the binary
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/cloudflare-ddns
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/cloudflare-ddns
 
 ############################
 # STEP 2 build a small image
